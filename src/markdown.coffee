@@ -109,12 +109,25 @@ renderImage = (renderer, options) ->
     $('figcaption').prepend figurePrefix()
     $('figure').outerHTML()
 
+renderParagraph = (renderer) ->
+  dropcapRE = /^\s*<span\s+class\s*=\s"dropcap"*/i
+  notInParaRE = /^\s*<\s*(figure|caption|table|thead|th|tr|td)/i
+  (text) ->
+    #console.log '--renderPara', text
+    if text.match dropcapRE
+      text
+    else if text.match notInParaRE
+      text
+    else 
+      "<p>#{text}</p>"
+
 newRenderer = (filePath, parsed) ->
   renderer = new marked.Renderer()
   renderer.heading = renderHeading(renderer, filePath)
   renderer.html = renderHTML(renderer, if parsed.number then { number: parsed.number, prefix: 'Table'} else {})
   renderer.link = renderLink(renderer)
   renderer.image = renderImage(renderer, if parsed.number then { number: parsed.number, prefix: 'Figure' } else {})
+  renderer.paragraph = renderParagraph(renderer)
   renderer
 
 # parse will take in the file object itself... that might be the right way to do the job...  
